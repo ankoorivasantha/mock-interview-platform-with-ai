@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
 
-import { getCurrentUser } from "@/lib/actions/auth.action";
+import { getCurrentUser, } from "@/lib/actions/auth.action";
 import {
   getInterviewsByUserId,
   getLatestInterviews,
@@ -13,29 +13,16 @@ import {
 async function Home() {
   const user = await getCurrentUser();
 
-  // ✅ Handle not logged-in case early
-  if (!user) {
-    return (
-      <section className="flex flex-col gap-6 mt-8">
-        <h2>Your Interviews</h2>
-        <p>Please log in to see your interviews.</p>
-      </section>
-    );
-  }
-
-  // ✅ Fetch interviews safely
   const [userInterviews, allInterview] = await Promise.all([
-    getInterviewsByUserId(user.id),
-    getLatestInterviews({ userId: user.id }),
+    getInterviewsByUserId(user?.id!),
+    getLatestInterviews({ userId: user?.id! }),
   ]);
 
-  // ✅ Use nullish coalescing to avoid warnings
-  const hasPastInterviews = (userInterviews?.length ?? 0) > 0;
-  const hasUpcomingInterviews = (allInterview?.length ?? 0) > 0;
+  const hasPastInterviews = userInterviews?.length! > 0;
+  const hasUpcomingInterviews = allInterview?.length! > 0;
 
   return (
     <>
-      {/* Hero Section */}
       <section className="card-cta">
         <div className="flex flex-col gap-6 max-w-lg">
           <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
@@ -57,16 +44,15 @@ async function Home() {
         />
       </section>
 
-      {/* Past Interviews */}
       <section className="flex flex-col gap-6 mt-8">
         <h2>Your Interviews</h2>
 
         <div className="interviews-section">
           {hasPastInterviews ? (
-            userInterviews!.map((interview) => (
+            userInterviews?.map((interview) => (
               <InterviewCard
                 key={interview.id}
-                userId={user.id}
+                userId={user?.id}
                 interviewId={interview.id}
                 role={interview.role}
                 type={interview.type}
@@ -80,16 +66,15 @@ async function Home() {
         </div>
       </section>
 
-      {/* Upcoming Interviews */}
       <section className="flex flex-col gap-6 mt-8">
         <h2>Take Interviews</h2>
 
         <div className="interviews-section">
           {hasUpcomingInterviews ? (
-            allInterview!.map((interview) => (
+            allInterview?.map((interview) => (
               <InterviewCard
                 key={interview.id}
-                userId={user.id}
+                userId={user?.id}
                 interviewId={interview.id}
                 role={interview.role}
                 type={interview.type}
